@@ -1,0 +1,23 @@
+Package: factorselect
+Title: Eigenvalue-Based Estimation of the Number of Factors in Approximate Factor Models
+Version: 0.1.0
+Authors@R: person("Jason", "Parker", email = "jparker588@gmail.com",
+                  role = c("aut", "cre"),
+                  comment = c(ORCID = "0000-0001-9227-6976"))
+Description: An R package for eigenvalue-based estimation of the number 
+    of factors in approximate factor models. Designed to work when either 
+    N or T is large, without requiring both dimensions to grow 
+    simultaneously.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Suggests:
+    RSpectra,
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+VignetteBuilder: knitr
+URL: https://github.com/yourusername/factorselect
+BugReports: https://github.com/yourusername/factorselect/issues
