@@ -100,16 +100,16 @@ select_factors <- function(X,
   # Single eigendecomposition shared across all estimators
   eig <- .extract_eigenvalues(X_clean, kmax = kmax)
 
-  # Bai & Ng requires unstandardized data — prepare separately if needed
-  if ("bai_ng" %in% method) {
+  # Bai & Ng and ABC require unstandardized data — prepare once if needed
+  if (any(c("bai_ng", "abc") %in% method)) {
     X_bn   <- .prepare_matrix(X, demean = demean, standardize = FALSE)
     V0     <- sum(X_bn^2) / (N_dim * T_dim)
     eig_bn <- .extract_eigenvalues(X_bn, kmax = kmax)
   }
 
   # Dispatch to each requested estimator
-  details <- list()
-  k       <- integer(length(method))
+  details  <- list()
+  k        <- integer(length(method))
   names(k) <- method
 
   for (m in method) {
@@ -125,14 +125,17 @@ select_factors <- function(X,
                        k[m] <- res$k_ic1
                        res
                      },
+                     abc = {
+                       res  <- .abc(eig_bn$values, V0 = V0, kmax = kmax,
+                                    N = N_dim, TT = T_dim)
+                       k[m] <- res$k_abc1
+                       res
+                     },
                      onatski_2009 = {
                        stop("onatski_2009 not yet implemented.")
                      },
                      onatski_2010 = {
                        stop("onatski_2010 not yet implemented.")
-                     },
-                     abc = {
-                       stop("abc not yet implemented.")
                      },
                      lam_yao = {
                        stop("lam_yao not yet implemented.")
