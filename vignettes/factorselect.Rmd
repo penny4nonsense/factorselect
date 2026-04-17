@@ -1,0 +1,198 @@
+---
+title: "Introduction to factorselect"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to factorselect}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(factorselect)
+```
+
+## Introduction
+
+The `factorselect` package implements six estimators for determining
+the number of factors in large dimensional approximate factor models.
+The estimators differ in their theoretical assumptions, computational
+approach, and finite sample performance.
+
+The recommended estimator for most applications is the Ahn and
+Horenstein (2013) eigenvalue ratio estimator, which is robust to
+perturbations in the eigenvalue spectrum and performs well when only
+one of N or T is large.
+
+## Simulating Factor Model Data
+
+The package includes a helper function for simulating data from a
+static approximate factor model:
+
+$$X = F \Lambda' + E$$
+
+where $F$ is a $T \times k$ matrix of factors, $\Lambda$ is an
+$N \times k$ matrix of loadings, and $E$ is an $N \times T$ matrix
+of idiosyncratic errors.
+
+```{r simulate}
+set.seed(42)
+X <- simulate_factor_model(N = 100, TT = 200, k = 3, sd = 0.5)
+dim(X)
+```
+
+## The Recommended Estimator: Ahn & Horenstein (2013)
+
+The eigenvalue ratio (ER) and growth ratio (GR) estimators of Ahn and
+Horenstein (2013) are obtained by maximizing the ratio of adjacent
+eigenvalues of the sample covariance matrix. The ratio approach
+provides robustness to perturbations in the eigenvalue spectrum.
+
+A key advantage over Bai and Ng (2002) is that the Ahn-Horenstein
+estimator works well when only one of N or T is large, not requiring
+both dimensions to grow simultaneously.
+
+```{r ahn_horenstein}
+result <- select_factors(X, method = "ahn_horenstein", kmax = 8)
+print(result)
+```
+
+## Comparing All Estimators
+
+All six estimators can be run simultaneously by passing a vector of
+method names:
+
+```{r all_methods}
+result_all <- select_factors(
+  X,
+  method = c("ahn_horenstein", "bai_ng", "abc",
+             "lam_yao", "onatski_2009", "onatski_2010"),
+  kmax   = 8
+)
+print(result_all)
+```
+
+## Scree Plot
+
+The `plot` method produces a scree plot of the leading eigenvalues
+with the selected number of factors marked for each estimator:
+
+```{r scree, fig.width = 6, fig.height = 4}
+result_ah <- select_factors(X, method = "ahn_horenstein", kmax = 8)
+plot(result_ah, main = "Scree Plot — Ahn & Horenstein (2013)")
+```
+
+## Finite Sample Performance
+
+To illustrate the finite sample performance of the estimators, we
+run a small simulation study with 100 replications across three
+sample size configurations.
+
+```{r simulation, cache = TRUE}
+set.seed(123)
+n_reps  <- 100
+k_true  <- 3
+configs <- list(
+  large_both  = list(N = 100, TT = 200),
+  small_N     = list(N = 25,  TT = 200),
+  small_T     = list(N = 200, TT = 25)
+)
+
+results <- lapply(configs, function(cfg) {
+  estimates <- replicate(n_reps, {
+    X <- simulate_factor_model(N = cfg$N, TT = cfg$TT,
+                               k = k_true, sd = 0.5)
+    res <- select_factors(X,
+                          method = c("ahn_horenstein", "bai_ng",
+                                     "onatski_2010"),
+                          kmax   = 8)
+    res$k
+  })
+  rowMeans(estimates == k_true)
+})
+
+# Percentage correct for each configuration
+do.call(rbind, lapply(names(results), function(nm) {
+  data.frame(
+    config         = nm,
+    ahn_horenstein = round(results[[nm]]["ahn_horenstein"] * 100),
+    bai_ng         = round(results[[nm]]["bai_ng"] * 100),
+    onatski_2010   = round(results[[nm]]["onatski_2010"] * 100)
+  )
+}))
+```
+
+The simulation confirms that Ahn and Horenstein (2013) performs well
+across all three configurations, including when only one dimension is
+large. Bai and Ng (2002) tends to be less reliable in the asymmetric
+sample size cases.
+
+## Notes on Individual Estimators
+
+### Bai & Ng (2002) and ABC (2010)
+
+These estimators use unstandardized data internally. The `select_factors`
+function handles this automatically — users do not need to preprocess
+data differently when requesting these methods.
+
+### Lam & Yao (2012)
+
+This estimator uses lagged auto-covariance matrices rather than the
+contemporaneous covariance matrix. The number of lags `h` defaults to
+1 but can be adjusted:
+
+```{r lam_yao}
+result_ly <- select_factors(X, method = "lam_yao", kmax = 8, h = 1)
+print(result_ly)
+```
+
+### Onatski (2009)
+
+This estimator performs a sequential hypothesis test. The significance
+level `alpha` defaults to 0.05 but can be adjusted:
+
+```{r onatski_2009}
+result_o09 <- select_factors(X, method = "onatski_2009",
+                              kmax = 8, alpha = 0.05)
+print(result_o09)
+```
+
+### Onatski (2010)
+
+The edge distribution estimator uses an iterative calibration
+procedure to estimate the threshold separating systematic from
+idiosyncratic eigenvalues:
+
+```{r onatski_2010}
+result_o10 <- select_factors(X, method = "onatski_2010", kmax = 8)
+print(result_o10)
+```
+
+## References
+
+Ahn, S.C. and Horenstein, A.R. (2013). Eigenvalue Ratio Test for the
+Number of Factors. *Econometrica*, 81(3), 1203-1227.
+
+Bai, J. and Ng, S. (2002). Determining the Number of Factors in
+Approximate Factor Models. *Econometrica*, 70(1), 191-221.
+
+Alessi, L., Barigozzi, M. and Capasso, M. (2010). Improved Penalization
+for Determining the Number of Factors in Approximate Factor Models.
+*Statistics and Probability Letters*, 80, 1806-1813.
+
+Lam, C. and Yao, Q. (2012). Factor Modelling for High-Dimensional Time
+Series: Inference for the Number of Factors. *The Annals of Statistics*,
+40(2), 694-726.
+
+Onatski, A. (2009). Testing Hypotheses About the Number of Factors in
+Large Factor Models. *Econometrica*, 77(5), 1447-1479.
+
+Onatski, A. (2010). Determining the Number of Factors From Empirical
+Distribution of Eigenvalues. *The Review of Economics and Statistics*,
+92(4), 1004-1016.

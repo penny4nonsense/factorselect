@@ -4,3 +4,6 @@
 ^README\.Rmd$
 ^factorselect\.Rproj$
 ^LICENSE\.md$
+^doc$
+^Meta$
+^cran-comments\.md$

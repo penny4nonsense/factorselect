@@ -232,10 +232,11 @@ summary.factor_select <- function(object, ...) {
 #' number of factors marked.
 #'
 #' @param x A \code{factor_select} object.
+#' @param main Character string. Plot title. Defaults to \code{"Scree Plot"}.
 #' @param ... Further arguments passed to \code{plot()}.
 #' @importFrom graphics abline legend
 #' @export
-plot.factor_select <- function(x, ...) {
+plot.factor_select <- function(x, main = "Scree Plot", ...) {
   eigs <- x$eigenvalues
   k    <- x$k
 
@@ -243,7 +244,7 @@ plot.factor_select <- function(x, ...) {
        type = "b",
        xlab = "Factor Number",
        ylab = "Eigenvalue",
-       main = "Scree Plot",
+       main = main,
        pch  = 19, ...)
 
   cols <- c("red", "blue", "darkgreen", "purple", "orange", "brown")

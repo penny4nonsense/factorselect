@@ -4,10 +4,12 @@
 \alias{plot.factor_select}
 \title{Plot Method for factor_select Objects}
 \usage{
-\method{plot}{factor_select}(x, ...)
+\method{plot}{factor_select}(x, main = "Scree Plot", ...)
 }
 \arguments{
 \item{x}{A \code{factor_select} object.}
+
+\item{main}{Character string. Plot title. Defaults to \code{"Scree Plot"}.}
 
 \item{...}{Further arguments passed to \code{plot()}.}
 }

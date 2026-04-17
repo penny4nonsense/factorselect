@@ -1,2 +1,105 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # factorselect
-An R package for eigenvalue-based estimation of the number  of factors in approximate factor models. Designed to work  when either N or T is large, without requiring both  dimensions to grow simultaneously.
+
+An R package for eigenvalue-based estimation of the number of factors in
+approximate factor models. Designed to work when either N or T is large,
+without requiring both dimensions to grow simultaneously.
+
+## Installation
+
+``` r
+# Development version from GitHub
+devtools::install_github("penny4nonsense/factorselect")
+```
+
+## Basic Usage
+
+``` r
+library(factorselect)
+
+# Simulate a factor model with 3 true factors
+X <- simulate_factor_model(N = 100, TT = 200, k = 3, sd = 0.5, seed = 42)
+
+# Estimate number of factors using Ahn & Horenstein (2013)
+result <- select_factors(X, method = "ahn_horenstein", kmax = 8)
+print(result)
+#> Factor Number Selection
+#> =======================
+#> Call: select_factors(X = X, method = "ahn_horenstein", kmax = 8)
+#> 
+#> kmax: 8 
+#> 
+#> Estimated number of factors:
+#>   ahn_horenstein       3
+```
+
+## All Methods
+
+``` r
+# Run all estimators at once
+result <- select_factors(X,
+                         method = c("ahn_horenstein", "bai_ng", "abc",
+                                    "lam_yao", "onatski_2009", "onatski_2010"),
+                         kmax   = 8)
+print(result)
+#> Factor Number Selection
+#> =======================
+#> Call: select_factors(X = X, method = c("ahn_horenstein", "bai_ng", 
+#>     "abc", "lam_yao", "onatski_2009", "onatski_2010"), kmax = 8)
+#> 
+#> kmax: 8 
+#> 
+#> Estimated number of factors:
+#>   ahn_horenstein       3
+#>   bai_ng               3
+#>   abc                  3
+#>   lam_yao              6
+#>   onatski_2009         3
+#>   onatski_2010         3
+```
+
+## Scree Plot
+
+``` r
+# Visualize the eigenvalue spectrum
+result <- select_factors(X, method = "ahn_horenstein", kmax = 8)
+plot(result)
+```
+
+<img src="man/figures/README-plot-1.png" alt="" width="100%" />
+
+## Methods Implemented
+
+| Method                        | Reference                          |
+|-------------------------------|------------------------------------|
+| Eigenvalue Ratio (ER, GR)     | Ahn & Horenstein (2013)            |
+| Information Criteria (PC, IC) | Bai & Ng (2002)                    |
+| Tuned Information Criteria    | Alessi, Barigozzi & Capasso (2010) |
+| Auto-covariance Ratio         | Lam & Yao (2012)                   |
+| Edge Distribution Test        | Onatski (2009)                     |
+| Edge Distribution Estimator   | Onatski (2010)                     |
+
+## References
+
+Ahn, S.C. and Horenstein, A.R. (2013). Eigenvalue Ratio Test for the
+Number of Factors. *Econometrica*, 81(3), 1203-1227.
+
+Bai, J. and Ng, S. (2002). Determining the Number of Factors in
+Approximate Factor Models. *Econometrica*, 70(1), 191-221.
+
+Alessi, L., Barigozzi, M. and Capasso, M. (2010). Improved Penalization
+for Determining the Number of Factors in Approximate Factor Models.
+*Statistics and Probability Letters*, 80, 1806-1813.
+
+Lam, C. and Yao, Q. (2012). Factor Modelling for High-Dimensional Time
+Series: Inference for the Number of Factors. *The Annals of Statistics*,
+40(2), 694-726.
+
+Onatski, A. (2009). Testing Hypotheses About the Number of Factors in
+Large Factor Models. *Econometrica*, 77(5), 1447-1479.
+
+Onatski, A. (2010). Determining the Number of Factors From Empirical
+Distribution of Eigenvalues. *The Review of Economics and Statistics*,
+92(4), 1004-1016.
