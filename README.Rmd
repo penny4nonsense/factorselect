@@ -1,0 +1,57 @@
+---
+output: github_document
+---
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# factorselect
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+An R package for eigenvalue-based estimation of the number of factors 
+in approximate factor models. Designed to work when either N or T is 
+large, without requiring both dimensions to grow simultaneously.
+
+## Installation
+
+```r
+# Development version from GitHub
+devtools::install_github("penny4nonsense/factorselect")
+```
+
+## Basic Usage
+
+```{r example}
+library(factorselect)
+
+# Simulate a factor model with 3 true factors
+set.seed(42)
+X <- simulate_factor_model(N = 100, T = 200, k = 3)
+
+# Estimate number of factors
+select_factors(X, method = "ahn_horenstein")
+```
+
+## Methods Implemented
+
+| Method | Reference |
+|--------|-----------|
+| Eigenvalue Ratio (ER, GR) | Ahn & Horenstein (2013) |
+| Information Criteria | Bai & Ng (2002) |
+| Edge Distribution Test | Onatski (2009, 2010) |
+| ABC Penalty | Alessi, Barigozzi & Capasso (2010) |
+| Ratio-Based | Lam & Yao (2012) |
+
+## References
+
+Ahn, S.C. and Horenstein, A.R. (2013). Eigenvalue Ratio Test for the
+Number of Factors. *Econometrica*, 81(3), 1203-1227.
