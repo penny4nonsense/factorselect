@@ -100,8 +100,8 @@ select_factors <- function(X,
   # Single eigendecomposition shared across all estimators
   eig <- .extract_eigenvalues(X_clean, kmax = kmax)
 
-  # Bai & Ng and ABC require unstandardized data — prepare once if needed
-  if (any(c("bai_ng", "abc") %in% method)) {
+  # Bai & Ng, ABC, and Lam-Yao require unstandardized data
+  if (any(c("bai_ng", "abc", "lam_yao") %in% method)) {
     X_bn   <- .prepare_matrix(X, demean = demean, standardize = FALSE)
     V0     <- sum(X_bn^2) / (N_dim * T_dim)
     eig_bn <- .extract_eigenvalues(X_bn, kmax = kmax)
@@ -138,7 +138,9 @@ select_factors <- function(X,
                        stop("onatski_2010 not yet implemented.")
                      },
                      lam_yao = {
-                       stop("lam_yao not yet implemented.")
+                       res  <- .lam_yao(X_bn, kmax = kmax, h = 1)
+                       k[m] <- res$k
+                       res
                      }
     )
     details[[m]] <- result
