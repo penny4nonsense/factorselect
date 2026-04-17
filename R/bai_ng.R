@@ -10,6 +10,8 @@
 #' @param kmax Integer. Maximum number of factors to consider.
 #' @param N Integer. Number of cross-sectional units.
 #' @param TT Integer. Number of time periods.
+#' @param V0 Numeric scalar. Total mean squared value of the panel,
+#'   \code{sum(X^2) / (N * TT)}, computed from unstandardized demeaned data.
 #'
 #' @return A named list with the following elements:
 #'   \describe{

@@ -43,6 +43,8 @@
 #'
 #' @seealso \code{\link{select_factors}}
 #'
+#' @importFrom stats rnorm
+#'
 #' @export
 #'
 #' @examples

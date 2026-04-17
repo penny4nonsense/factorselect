@@ -18,8 +18,15 @@
 #'   \code{"both"}, \code{"individual"}, \code{"time"}, \code{"none"}.
 #'   Defaults to \code{"both"} as recommended by Ahn and Horenstein (2013).
 #' @param standardize Logical. Whether to standardize columns to unit variance
-#'   before estimation. Defaults to \code{TRUE}. Note that \code{bai_ng}
-#'   always uses unstandardized data regardless of this setting.
+#'   before estimation. Defaults to \code{TRUE}. Note that \code{bai_ng},
+#'   \code{abc}, and \code{lam_yao} always use unstandardized data regardless
+#'   of this setting.
+#' @param h Integer. Number of lags to use for the \code{lam_yao} estimator.
+#'   Defaults to \code{1}. Ignored for all other methods.
+#' @param alpha Numeric. Significance level for the \code{onatski_2009}
+#'   sequential test. Defaults to \code{0.05}. Must be one of
+#'   \code{0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.15}.
+#'   Ignored for all other methods.
 #'
 #' @return An object of class \code{"factor_select"}, which is a named list
 #'   with the following elements:
@@ -42,9 +49,9 @@
 #'   most applications. It is robust to perturbations in the eigenvalue
 #'   spectrum and performs well when only one of N or T is large.
 #'
-#'   The \code{"bai_ng"} method always uses unstandardized data because its
-#'   penalty terms are calibrated to the scale of the raw data. Standardizing
-#'   makes the penalty too small relative to the noise eigenvalue drops.
+#'   The \code{"bai_ng"}, \code{"abc"}, and \code{"lam_yao"} methods always
+#'   use unstandardized data because their penalty terms and auto-covariance
+#'   structure depend on the actual scale of the data.
 #'
 #' @references
 #'   Ahn, S.C. and Horenstein, A.R. (2013). Eigenvalue Ratio Test for the
@@ -53,7 +60,16 @@
 #'   Bai, J. and Ng, S. (2002). Determining the Number of Factors in
 #'   Approximate Factor Models. \emph{Econometrica}, 70(1), 191-221.
 #'
+#'   Alessi, L., Barigozzi, M. and Capasso, M. (2010). Improved Penalization
+#'   for Determining the Number of Factors in Approximate Factor Models.
+#'   \emph{Statistics and Probability Letters}, 80, 1806-1813.
+#'
+#'   Lam, C. and Yao, Q. (2012). Factor Modelling for High-Dimensional
+#'   Time Series: Inference for the Number of Factors.
+#'   \emph{The Annals of Statistics}, 40(2), 694-726.
+#'
 #' @seealso \code{\link{.ahn_horenstein}}, \code{\link{.bai_ng}},
+#'   \code{\link{.abc}}, \code{\link{.lam_yao}},
 #'   \code{\link{.prepare_matrix}}, \code{\link{.extract_eigenvalues}}
 #'
 #' @importFrom graphics abline legend
@@ -71,7 +87,9 @@ select_factors <- function(X,
                            method      = "ahn_horenstein",
                            kmax        = NULL,
                            demean      = c("both", "individual", "time", "none"),
-                           standardize = TRUE) {
+                           standardize = TRUE,
+                           h           = 1L,
+                           alpha       = 0.05) {
 
   call   <- match.call()
   demean <- match.arg(demean)
@@ -83,6 +101,18 @@ select_factors <- function(X,
   if (length(bad) > 0) {
     stop("Unknown method(s): ", paste(bad, collapse = ", "),
          "\nValid methods: ", paste(valid_methods, collapse = ", "))
+  }
+
+  # Validate h
+  if (!is.numeric(h) || length(h) != 1 || h < 1) {
+    stop("h must be a single positive integer.")
+  }
+
+  # Validate alpha
+  valid_alphas <- c(0.15, 0.10, 0.09, 0.08, 0.07, 0.06,
+                    0.05, 0.04, 0.03, 0.02, 0.01)
+  if (!alpha %in% valid_alphas) {
+    stop("alpha must be one of: ", paste(valid_alphas, collapse = ", "))
   }
 
   # Preprocess — standardized version for most estimators
@@ -97,10 +127,10 @@ select_factors <- function(X,
     kmax <- min(floor(sqrt(n)), 8)
   }
 
-  # Single eigendecomposition shared across all estimators
+  # Single eigendecomposition shared across standardized estimators
   eig <- .extract_eigenvalues(X_clean, kmax = kmax)
 
-  # Bai & Ng, ABC, and Lam-Yao require unstandardized data
+  # Bai & Ng, ABC and Lam-Yao require unstandardized data
   if (any(c("bai_ng", "abc", "lam_yao") %in% method)) {
     X_bn   <- .prepare_matrix(X, demean = demean, standardize = FALSE)
     V0     <- sum(X_bn^2) / (N_dim * T_dim)
@@ -131,15 +161,20 @@ select_factors <- function(X,
                        k[m] <- res$k_abc1
                        res
                      },
+                     lam_yao = {
+                       res  <- .lam_yao(X_bn, kmax = kmax, h = h)
+                       k[m] <- res$k
+                       res
+                     },
                      onatski_2009 = {
-                       stop("onatski_2009 not yet implemented.")
+                       res  <- .onatski_2009(X_clean, kmax = kmax, alpha = alpha)
+                       k[m] <- res$k
+                       res
                      },
                      onatski_2010 = {
-                       stop("onatski_2010 not yet implemented.")
-                     },
-                     lam_yao = {
-                       res  <- .lam_yao(X_bn, kmax = kmax, h = 1)
-                       k[m] <- res$k
+                       eig_ed <- .extract_eigenvalues(X_clean, kmax = kmax + 4)
+                       res    <- .onatski_2010(eig_ed$values, kmax = kmax)
+                       k[m]   <- res$k
                        res
                      }
     )

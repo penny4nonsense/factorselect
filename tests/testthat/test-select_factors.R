@@ -74,12 +74,6 @@ test_that("unknown method throws informative error", {
   expect_error(select_factors(X, method = "made_up"), "Unknown method")
 })
 
-test_that("unimplemented method throws informative error", {
-  set.seed(42)
-  X <- matrix(rnorm(2000), 200, 100)
-  expect_error(select_factors(X, method = "onatski_2009"), "not yet implemented")
-})
-
 test_that("details list contains entry for each method", {
   set.seed(42)
   X <- matrix(rnorm(2000), 200, 100)

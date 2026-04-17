@@ -9,7 +9,9 @@ select_factors(
   method = "ahn_horenstein",
   kmax = NULL,
   demean = c("both", "individual", "time", "none"),
-  standardize = TRUE
+  standardize = TRUE,
+  h = 1L,
+  alpha = 0.05
 )
 }
 \arguments{
@@ -31,7 +33,17 @@ more of \code{"ahn_horenstein"}, \code{"bai_ng"}, \code{"onatski_2009"},
 Defaults to \code{"both"} as recommended by Ahn and Horenstein (2013).}
 
 \item{standardize}{Logical. Whether to standardize columns to unit variance
-before estimation. Defaults to \code{TRUE}.}
+before estimation. Defaults to \code{TRUE}. Note that \code{bai_ng},
+\code{abc}, and \code{lam_yao} always use unstandardized data regardless
+of this setting.}
+
+\item{h}{Integer. Number of lags to use for the \code{lam_yao} estimator.
+Defaults to \code{1}. Ignored for all other methods.}
+
+\item{alpha}{Numeric. Significance level for the \code{onatski_2009}
+sequential test. Defaults to \code{0.05}. Must be one of
+\code{0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.15}.
+Ignored for all other methods.}
 }
 \value{
 An object of class \code{"factor_select"}, which is a named list
@@ -59,6 +71,10 @@ which is shared across all requested estimators for efficiency.
 The default method is \code{"ahn_horenstein"}, which is recommended for
 most applications. It is robust to perturbations in the eigenvalue
 spectrum and performs well when only one of N or T is large.
+
+The \code{"bai_ng"}, \code{"abc"}, and \code{"lam_yao"} methods always
+use unstandardized data because their penalty terms and auto-covariance
+structure depend on the actual scale of the data.
 }
 \examples{
 set.seed(42)
@@ -67,15 +83,25 @@ Lambda <- matrix(rnorm(N * k_true), N, k_true)
 F_mat  <- matrix(rnorm(T * k_true), T, k_true)
 E      <- matrix(rnorm(T * N, sd = 0.5), T, N)
 X      <- F_mat \%*\% t(Lambda) + E
-
-# Single method
 select_factors(X)
 }
 \references{
 Ahn, S.C. and Horenstein, A.R. (2013). Eigenvalue Ratio Test for the
 Number of Factors. \emph{Econometrica}, 81(3), 1203-1227.
+
+Bai, J. and Ng, S. (2002). Determining the Number of Factors in
+Approximate Factor Models. \emph{Econometrica}, 70(1), 191-221.
+
+Alessi, L., Barigozzi, M. and Capasso, M. (2010). Improved Penalization
+for Determining the Number of Factors in Approximate Factor Models.
+\emph{Statistics and Probability Letters}, 80, 1806-1813.
+
+Lam, C. and Yao, Q. (2012). Factor Modelling for High-Dimensional
+Time Series: Inference for the Number of Factors.
+\emph{The Annals of Statistics}, 40(2), 694-726.
 }
 \seealso{
-\code{\link{.ahn_horenstein}}, \code{\link{.prepare_matrix}},
-\code{\link{.extract_eigenvalues}}
+\code{\link{.ahn_horenstein}}, \code{\link{.bai_ng}},
+\code{\link{.abc}}, \code{\link{.lam_yao}},
+\code{\link{.prepare_matrix}}, \code{\link{.extract_eigenvalues}}
 }
