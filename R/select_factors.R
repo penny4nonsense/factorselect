@@ -18,7 +18,8 @@
 #'   \code{"both"}, \code{"individual"}, \code{"time"}, \code{"none"}.
 #'   Defaults to \code{"both"} as recommended by Ahn and Horenstein (2013).
 #' @param standardize Logical. Whether to standardize columns to unit variance
-#'   before estimation. Defaults to \code{TRUE}.
+#'   before estimation. Defaults to \code{TRUE}. Note that \code{bai_ng}
+#'   always uses unstandardized data regardless of this setting.
 #'
 #' @return An object of class \code{"factor_select"}, which is a named list
 #'   with the following elements:
@@ -41,12 +42,19 @@
 #'   most applications. It is robust to perturbations in the eigenvalue
 #'   spectrum and performs well when only one of N or T is large.
 #'
+#'   The \code{"bai_ng"} method always uses unstandardized data because its
+#'   penalty terms are calibrated to the scale of the raw data. Standardizing
+#'   makes the penalty too small relative to the noise eigenvalue drops.
+#'
 #' @references
 #'   Ahn, S.C. and Horenstein, A.R. (2013). Eigenvalue Ratio Test for the
 #'   Number of Factors. \emph{Econometrica}, 81(3), 1203-1227.
 #'
-#' @seealso \code{\link{.ahn_horenstein}}, \code{\link{.prepare_matrix}},
-#'   \code{\link{.extract_eigenvalues}}
+#'   Bai, J. and Ng, S. (2002). Determining the Number of Factors in
+#'   Approximate Factor Models. \emph{Econometrica}, 70(1), 191-221.
+#'
+#' @seealso \code{\link{.ahn_horenstein}}, \code{\link{.bai_ng}},
+#'   \code{\link{.prepare_matrix}}, \code{\link{.extract_eigenvalues}}
 #'
 #' @importFrom graphics abline legend
 #' @export
@@ -58,8 +66,6 @@
 #' F_mat  <- matrix(rnorm(T * k_true), T, k_true)
 #' E      <- matrix(rnorm(T * N, sd = 0.5), T, N)
 #' X      <- F_mat %*% t(Lambda) + E
-#'
-#' # Single method
 #' select_factors(X)
 select_factors <- function(X,
                            method      = "ahn_horenstein",
@@ -79,7 +85,7 @@ select_factors <- function(X,
          "\nValid methods: ", paste(valid_methods, collapse = ", "))
   }
 
-  # Preprocess — one call shared by all estimators
+  # Preprocess — standardized version for most estimators
   X_clean <- .prepare_matrix(X, demean = demean, standardize = standardize)
 
   T_dim <- nrow(X_clean)
@@ -94,6 +100,13 @@ select_factors <- function(X,
   # Single eigendecomposition shared across all estimators
   eig <- .extract_eigenvalues(X_clean, kmax = kmax)
 
+  # Bai & Ng requires unstandardized data — prepare separately if needed
+  if ("bai_ng" %in% method) {
+    X_bn   <- .prepare_matrix(X, demean = demean, standardize = FALSE)
+    V0     <- sum(X_bn^2) / (N_dim * T_dim)
+    eig_bn <- .extract_eigenvalues(X_bn, kmax = kmax)
+  }
+
   # Dispatch to each requested estimator
   details <- list()
   k       <- integer(length(method))
@@ -102,12 +115,15 @@ select_factors <- function(X,
   for (m in method) {
     result <- switch(m,
                      ahn_horenstein = {
-                       res      <- .ahn_horenstein(eig$values, kmax = kmax, n = n)
-                       k[m]     <- res$k_gr   # GR is preferred by default
+                       res  <- .ahn_horenstein(eig$values, kmax = kmax, n = n)
+                       k[m] <- res$k_gr
                        res
                      },
                      bai_ng = {
-                       stop("bai_ng not yet implemented.")
+                       res  <- .bai_ng(eig_bn$values, V0 = V0, kmax = kmax,
+                                       N = N_dim, TT = T_dim)
+                       k[m] <- res$k_ic1
+                       res
                      },
                      onatski_2009 = {
                        stop("onatski_2009 not yet implemented.")
@@ -190,13 +206,12 @@ plot.factor_select <- function(x, ...) {
        main = "Scree Plot",
        pch  = 19, ...)
 
-  # Mark each estimator's selection
   cols <- c("red", "blue", "darkgreen", "purple", "orange", "brown")
   for (i in seq_along(x$method)) {
-    abline(v    = k[x$method[i]],
-           col  = cols[i],
-           lty  = 2,
-           lwd  = 1.5)
+    abline(v   = k[x$method[i]],
+           col = cols[i],
+           lty = 2,
+           lwd = 1.5)
   }
 
   legend("topright",
