@@ -45,15 +45,6 @@
 #'   \emph{The Annals of Statistics}, 40(2), 694-726.
 #'
 #' @seealso \code{\link{.ahn_horenstein}}, \code{\link{select_factors}}
-#'
-#' @examples
-#' \dontrun{
-#' set.seed(42)
-#' X      <- simulate_factor_model(N = 100, TT = 200, k = 3, sd = 0.5)
-#' X      <- .prepare_matrix(X)
-#' result <- .lam_yao(X, kmax = 8, h = 1)
-#' result$k
-#' }
 .lam_yao <- function(X, kmax, h = 1) {
 
   TT <- nrow(X)

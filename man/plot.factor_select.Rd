@@ -13,6 +13,10 @@
 
 \item{...}{Further arguments passed to \code{plot()}.}
 }
+\value{
+Invisibly returns \code{x}, called for its side effect of
+producing a scree plot.
+}
 \description{
 Produces a scree plot of the leading eigenvalues with the selected
 number of factors marked.

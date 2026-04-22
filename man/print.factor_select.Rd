@@ -11,6 +11,10 @@
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+Invisibly returns \code{x}, called for its side effect of
+printing a summary of the factor selection results to the console.
+}
 \description{
 Print Method for factor_select Objects
 }

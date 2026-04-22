@@ -62,19 +62,6 @@
 #'
 #' @seealso \code{\link{.bai_ng}}, \code{\link{.extract_eigenvalues}},
 #'   \code{\link{select_factors}}
-#'
-#' @examples
-#' \dontrun{
-#' set.seed(42)
-#' X      <- simulate_factor_model(N = 100, TT = 200, k = 3, sd = 1)
-#' X      <- .prepare_matrix(X, standardize = FALSE)
-#' V0     <- sum(X^2) / (100 * 200)
-#' eig    <- .extract_eigenvalues(X, kmax = 8)
-#' result <- .abc(eig$values, V0 = V0, kmax = 8, N = 100, TT = 200)
-#' result$k_abc1
-#' result$k_abc2
-#' result$k_abc3
-#' }
 .abc <- function(eigenvalues, V0, kmax, N, TT,
                  c_grid = seq(0, 1, by = 0.01)) {
 

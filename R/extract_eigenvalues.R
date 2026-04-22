@@ -35,16 +35,6 @@
 #'   Number of Factors. \emph{Econometrica}, 81(3), 1203-1227.
 #'
 #' @seealso \code{\link{.prepare_matrix}}, \code{\link{.ahn_horenstein}}
-#'
-#' @examples
-#' \dontrun{
-#' set.seed(42)
-#' N <- 100; T <- 200
-#' X <- matrix(rnorm(T * N), T, N)
-#' X <- .prepare_matrix(X)
-#' eig <- .extract_eigenvalues(X, kmax = 8)
-#' eig$values
-#' }
 .extract_eigenvalues <- function(X, kmax) {
 
   T_dim <- nrow(X)

@@ -54,16 +54,6 @@
 #'   Statistics}, 92(4), 1004-1016.
 #'
 #' @seealso \code{\link{.extract_eigenvalues}}, \code{\link{select_factors}}
-#'
-#' @examples
-#' \dontrun{
-#' set.seed(42)
-#' X      <- simulate_factor_model(N = 100, TT = 200, k = 3, sd = 0.5)
-#' X      <- .prepare_matrix(X)
-#' eig    <- .extract_eigenvalues(X, kmax = 13)  # need kmax + 5 eigenvalues
-#' result <- .onatski_2010(eig$values, kmax = 8)
-#' result$k
-#' }
 .onatski_2010 <- function(eigenvalues, kmax, n_iter = 4L) {
 
   # Need at least kmax + 5 eigenvalues for the OLS window

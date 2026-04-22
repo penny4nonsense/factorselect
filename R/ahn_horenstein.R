@@ -39,21 +39,6 @@
 #'   Number of Factors. \emph{Econometrica}, 81(3), 1203-1227.
 #'
 #' @seealso \code{\link{.extract_eigenvalues}}, \code{\link{select_factors}}
-#'
-#' @examples
-#' \dontrun{
-#' set.seed(42)
-#' N <- 100; T <- 200; k_true <- 3
-#' Lambda <- matrix(rnorm(N * k_true), N, k_true)
-#' F_mat  <- matrix(rnorm(T * k_true), T, k_true)
-#' E      <- matrix(rnorm(N * T, sd = 0.5), T, N)
-#' X      <- F_mat %*% t(Lambda) + E
-#' X      <- .prepare_matrix(X)
-#' eig    <- .extract_eigenvalues(X, kmax = 8)
-#' result <- .ahn_horenstein(eig$values, kmax = 8, n = min(N, T))
-#' result$k_er
-#' result$k_gr
-#' }
 .ahn_horenstein <- function(eigenvalues, kmax, n) {
 
   eigs <- eigenvalues[1:(kmax + 1)]

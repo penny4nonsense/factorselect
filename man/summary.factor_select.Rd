@@ -11,6 +11,10 @@
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+Invisibly returns \code{object}, called for its side effect
+of printing a summary including leading eigenvalues to the console.
+}
 \description{
 Summary Method for factor_select Objects
 }

@@ -66,15 +66,6 @@ tested under the alternative \eqn{k_1 - k_0 = k_{max} - k_0}.
 If T is odd, the last observation is dropped to ensure equal-length
 halves.
 }
-\examples{
-\dontrun{
-set.seed(42)
-X      <- simulate_factor_model(N = 100, TT = 200, k = 3, sd = 0.5)
-X      <- .prepare_matrix(X)
-result <- .onatski_2009(X, kmax = 8, alpha = 0.05)
-result$k
-}
-}
 \references{
 Onatski, A. (2009). Testing Hypotheses About the Number of Factors
 in Large Factor Models. \emph{Econometrica}, 77(5), 1447-1479.

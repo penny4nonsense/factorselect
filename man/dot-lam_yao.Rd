@@ -50,15 +50,6 @@ of M spikes at r because eigenvalues r+1 onward are theoretically zero.
 The number of factors is estimated as:
 \deqn{\hat{r} = \arg\max_{1 \leq k \leq k_{max}} \frac{\lambda_k(M)}{\lambda_{k+1}(M)}}
 }
-\examples{
-\dontrun{
-set.seed(42)
-X      <- simulate_factor_model(N = 100, TT = 200, k = 3, sd = 0.5)
-X      <- .prepare_matrix(X)
-result <- .lam_yao(X, kmax = 8, h = 1)
-result$k
-}
-}
 \references{
 Lam, C. and Yao, Q. (2012). Factor Modelling for High-Dimensional
 Time Series: Inference for the Number of Factors.

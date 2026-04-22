@@ -199,6 +199,8 @@ select_factors <- function(X,
 #'
 #' @param x A \code{factor_select} object.
 #' @param ... Further arguments passed to or from other methods.
+#' @return Invisibly returns \code{x}, called for its side effect of
+#'   printing a summary of the factor selection results to the console.
 #' @export
 print.factor_select <- function(x, ...) {
   cat("Factor Number Selection\n")
@@ -217,6 +219,8 @@ print.factor_select <- function(x, ...) {
 #'
 #' @param object A \code{factor_select} object.
 #' @param ... Further arguments passed to or from other methods.
+#' @return Invisibly returns \code{object}, called for its side effect
+#'   of printing a summary including leading eigenvalues to the console.
 #' @export
 summary.factor_select <- function(object, ...) {
   print(object)
@@ -234,6 +238,8 @@ summary.factor_select <- function(object, ...) {
 #' @param x A \code{factor_select} object.
 #' @param main Character string. Plot title. Defaults to \code{"Scree Plot"}.
 #' @param ... Further arguments passed to \code{plot()}.
+#' @return Invisibly returns \code{x}, called for its side effect of
+#'   producing a scree plot.
 #' @importFrom graphics abline legend
 #' @export
 plot.factor_select <- function(x, main = "Scree Plot", ...) {

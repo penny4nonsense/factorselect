@@ -60,15 +60,6 @@
 #'   in Large Factor Models. \emph{Econometrica}, 77(5), 1447-1479.
 #'
 #' @seealso \code{\link{.ahn_horenstein}}, \code{\link{select_factors}}
-#'
-#' @examples
-#' \dontrun{
-#' set.seed(42)
-#' X      <- simulate_factor_model(N = 100, TT = 200, k = 3, sd = 0.5)
-#' X      <- .prepare_matrix(X)
-#' result <- .onatski_2009(X, kmax = 8, alpha = 0.05)
-#' result$k
-#' }
 .onatski_2009 <- function(X, kmax, alpha = 0.05) {
 
   # Critical values from Table I of Onatski (2009)

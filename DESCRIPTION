@@ -1,13 +1,20 @@
 Package: factorselect
 Title: Eigenvalue-Based Estimation of the Number of Factors in Approximate Factor Models
-Version: 0.1.0
+Version: 0.1.2
 Authors@R: person("Jason", "Parker", email = "jparker588@gmail.com",
                   role = c("aut", "cre"),
                   comment = c(ORCID = "0000-0001-9227-6976"))
-Description: An R package for eigenvalue-based estimation of the number 
-    of factors in approximate factor models. Designed to work when either 
-    N or T is large, without requiring both dimensions to grow 
-    simultaneously.
+Description: Eigenvalue-based estimation of the number of factors in
+    approximate factor models. Designed to work when either N or T is
+    large, without requiring both dimensions to grow simultaneously.
+    Implements the eigenvalue ratio estimator of Ahn and Horenstein
+    (2013) <doi:10.3982/ECTA8968>, the information criteria of Bai and
+    Ng (2002) <doi:10.1111/1468-0262.00273>, the tuned penalty of
+    Alessi, Barigozzi and Capasso (2010) <doi:10.1016/j.spl.2010.08.005>,
+    the auto-covariance ratio estimator of Lam and Yao (2012)
+    <doi:10.1214/12-AOS970>, and the edge distribution estimators of
+    Onatski (2009) <doi:10.3982/ECTA6964> and Onatski (2010)
+    <doi:10.1162/REST_a_00043>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

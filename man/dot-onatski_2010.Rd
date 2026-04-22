@@ -59,16 +59,6 @@ The estimator requires \code{eigenvalues} to contain at least
 \code{kmax + 5} elements so that the OLS window \eqn{j, \ldots, j+4}
 is always available.
 }
-\examples{
-\dontrun{
-set.seed(42)
-X      <- simulate_factor_model(N = 100, TT = 200, k = 3, sd = 0.5)
-X      <- .prepare_matrix(X)
-eig    <- .extract_eigenvalues(X, kmax = 13)  # need kmax + 5 eigenvalues
-result <- .onatski_2010(eig$values, kmax = 8)
-result$k
-}
-}
 \references{
 Onatski, A. (2010). Determining the Number of Factors From Empirical
 Distribution of Eigenvalues. \emph{The Review of Economics and
